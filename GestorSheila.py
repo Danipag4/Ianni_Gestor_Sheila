@@ -20,12 +20,23 @@ st.markdown("""
 @media print {
     @page {
         size: A4 portrait;
-        margin: 8mm;
+        margin: 6mm;
     }
 
     html, body {
         margin: 0 !important;
         padding: 0 !important;
+        overflow: hidden !important;
+    }
+
+    #root,
+    .stApp,
+    [data-testid="stAppViewContainer"],
+    [data-testid="stMain"],
+    .main,
+    .main .block-container {
+        height: auto !important;
+        min-height: 0 !important;
     }
 
     /* Ocultar barra lateral inteira */
@@ -52,10 +63,22 @@ st.markdown("""
     .main .block-container {
         padding: 0 !important;
         max-width: 100% !important;
+        zoom: 0.82;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+        page-break-after: avoid !important;
+        break-after: avoid !important;
     }
 
     [data-testid="stPlotlyChart"] {
         margin: 0 !important;
+        width: 100% !important;
+        overflow: visible !important;
+    }
+
+    [data-testid="stPlotlyChart"] > div {
+        width: 100% !important;
+        overflow: visible !important;
     }
 
     [data-testid="stImage"] img {
@@ -177,8 +200,6 @@ Nome = st.sidebar.selectbox(
 
 # Filtros e agregações do colaborador selecionado
 df_filtered = df[df["Colab"] == Nome]
-cargos_avaliado = df_filtered["Cargo"].dropna().astype(str).str.strip()
-cargo_avaliado = cargos_avaliado.iloc[0] if not cargos_avaliado.empty else "Não informado"
 df_Média = df_filtered.groupby("Compet")[["Gestor"]].mean().round(decimals=1).reset_index()
 aval = ["Gestor"]
 
@@ -202,7 +223,6 @@ if st.session_state.printing:
         f"""
         <div style="text-align: center; margin: 12px 0 18px;">
             <div style="font-size: 1.55rem; font-weight: 700;">Colaborador Avaliado: {escape(str(Nome))}</div>
-            <div style="font-size: 1.05rem; color: #4A5568; margin-top: 4px;">{escape(cargo_avaliado)}</div>
         </div>
         """,
         unsafe_allow_html=True
@@ -241,15 +261,13 @@ if st.session_state.printing:
             'scale': 2
         }
     }
-    col_grafico_esquerda, col_grafico, col_grafico_direita = st.columns([0.8, 2.4, 0.8])
-    with col_grafico:
-        st.plotly_chart(fig_comp, use_container_width=True, config=plotly_config_comp)
+    st.plotly_chart(fig_comp, use_container_width=True, config=plotly_config_comp)
     
     st.markdown("---")
     
     # 2. Linhas para Anotações / Plano de Ação
     st.write("### Anotações")
-    for i in range(4):
+    for i in range(5):
         st.markdown('<div style="border-bottom: 1px dotted #888; height: 24px; margin-bottom: 1px; width: 100%;"></div>', unsafe_allow_html=True)
         
     # Linha para data e assinatura de ciente
@@ -293,7 +311,6 @@ else:
         f"""
         <div style="text-align: center; margin: 12px 0 18px;">
             <div style="font-size: 1.55rem; font-weight: 700;">Colaborador Avaliado: {escape(str(Nome))}</div>
-            <div style="font-size: 1.05rem; color: #4A5568; margin-top: 4px;">{escape(cargo_avaliado)}</div>
         </div>
         """,
         unsafe_allow_html=True
